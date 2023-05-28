@@ -12,7 +12,7 @@ router.get("/", async (req, res, next) => {
     res.json(result);
     res.json(console.table(result));
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
@@ -21,13 +21,12 @@ router.get("/:id", async (req, res, next) => {
     const { id } = req.params;
     const result = await contactsService.getContactById(id);
     if (!result) {
-      throw HttpError(404, "NotFound");
+      throw HttpError(404, `Contact with ID: ${id} not found...`);
     }
     res.json(result);
     res.json(console.table(result));
   } catch (error) {
-    const { status = 500, message = "Server Error" } = error;
-    res.status(status).json({ message });
+    next(error);
   }
 });
 
