@@ -1,14 +1,35 @@
 const { HttpError } = require("../helpers");
 
-const validateBody = (schema) => {
+const validatePostBody = (schema) => {
   const func = (req, res, next) => {
-    const { error } = schema.validate(req.body);
+    const { error } = schema.validate(req.body, { abortEarly: false });
     if (error) {
-      next(HttpError(400, error.message));
+      const errorMessage = error.details
+        .map((detail) => {
+          const field = detail.context.label;
+          return field ? `${field} field` : "";
+        })
+        .join(", ");
+      next(HttpError(400, `Missing required ${errorMessage}`));
+    } else {
+      next();
     }
-    next();
   };
   return func;
 };
 
-module.exports = validateBody;
+const validatePutBody = () => {
+  const func = (req, res, next) => {
+    if (Object.keys(req.body).length === 0) {
+      next(HttpError(400, "Missing fields"));
+    } else {
+      next();
+    }
+  };
+  return func;
+};
+
+module.exports = {
+  validatePostBody,
+  validatePutBody,
+};
