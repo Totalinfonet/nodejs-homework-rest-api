@@ -18,12 +18,23 @@ const validatePostBody = (schema) => {
   return func;
 };
 
-const validatePutBody = () => {
+const validatePutBody = (schema) => {
   const func = (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
-      next(HttpError(400, "Missing fields"));
+      return res.status(400).json({ message: "Missing fields" });
     } else {
-      next();
+      const { error } = schema.validate(req.body, { abortEarly: false });
+      if (error) {
+        const errorMessage = error.details
+          .map((detail) => {
+            const field = detail.context.label;
+            return field ? `${field} field` : "";
+          })
+          .join(", ");
+        next(HttpError(400, `Missing required ${errorMessage}`));
+      } else {
+        next();
+      }
     }
   };
   return func;
