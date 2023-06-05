@@ -6,16 +6,6 @@ const cors = require("cors");
 
 const contactsRouter = require("./routes/api/contacts");
 
-const mongoose = require("mongoose");
-
-const DB_HOST =
-  "mongodb+srv://total:FXNMpTCtGk5FpfzW@cluster0.jo2kxch.mongodb.net/contacts_db?retryWrites=true&w=majority";
-
-mongoose
-  .connect(DB_HOST)
-  .then(() => console.log("DB connected successfully"))
-  .catch((error) => console.log(error.message));
-
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
