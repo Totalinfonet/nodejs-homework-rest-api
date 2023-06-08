@@ -5,6 +5,7 @@ const ctrl = require("../../controllers/contacts");
 const {
   validatePostBody,
   validatePutBody,
+  validatePatchBody,
   isValidId,
 } = require("../../middlewares");
 
@@ -18,7 +19,19 @@ router.get("/:id", isValidId, ctrl.getById);
 
 router.post("/", validatePostBody(schemas.contactAddSchema), ctrl.add);
 
-// router.put("/:id", isValidId, validatePutBody(schemas.contactAddSchema), ctrl.updateById);
+router.put(
+  "/:id",
+  isValidId,
+  validatePutBody(schemas.contactAddSchema),
+  ctrl.updateById
+);
+
+router.patch(
+  "/:id/favorite",
+  isValidId,
+  validatePatchBody(schemas.contactFavoriteUpdateSchema),
+  ctrl.updateStatusContact
+);
 
 // router.delete("/:id", isValidId, ctrl.deleteById);
 
