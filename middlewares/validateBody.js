@@ -40,7 +40,18 @@ const validatePutBody = (schema) => {
   return func;
 };
 
+const validatePatchBody = () => {
+  const func = (req, res, next) => {
+    if (!req.body || !req.body.favorite) {
+      return res.status(400).json({ message: "Missing field favorite" });
+    }
+    next();
+  };
+  return func;
+};
+
 module.exports = {
   validatePostBody,
   validatePutBody,
+  validatePatchBody,
 };
