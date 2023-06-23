@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
+const Jimp = require("jimp");
 const path = require("path");
 const fs = require("fs/promises");
 
@@ -85,7 +86,18 @@ const updateAvatar = async (req, res) => {
   const { path: tempUpload, originalname } = req.file;
   const filename = `${_id}_${originalname}`;
   const resultUpload = path.join(avatarsDir, filename);
-  await fs.rename(tempUpload, resultUpload);
+
+  await Jimp.read(tempUpload)
+    .then((image) => {
+      return image.resize(250, 250).write(resultUpload);
+    })
+    .catch(() => {
+      throw HttpError(500, "Avatar processing failed");
+    })
+    .finally(async () => {
+      await fs.unlink(tempUpload);
+    });
+
   const avatarURL = path.join("avatars", filename);
   await User.findByIdAndUpdate(_id, { avatarURL });
 
